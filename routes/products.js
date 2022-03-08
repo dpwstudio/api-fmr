@@ -51,18 +51,47 @@ router.post('/', (req, res) => {
   try {
     if (req) {
       const today = new Date();
-      const product = {
-        "image": moment(today).format("YYYYMMDD_hhmm") + '_' + req.body.image,
-        "name": req.body.name,
-        "category": req.body.category,
-        "ingredient": req.body.ingredient,
-        "description": req.body.description,
-        "price": req.body.price,
-        "createdAt": today,
+      const date = moment().format("YYYYMMDD_HHmm");
+      const DIR = 'http://dpwstudio.local:3000/images/users';
+      const productToSend = {
+        img: JSON.stringify([{
+          photoFace: `${DIR}/${date}_${req.body.photoFace}`,
+          photoDos: `${DIR}/${date}_${req.body.photoDos}`,
+          photoProfile: `${DIR}/${date}_${req.body.photoProfile}`,
+          photoGriffe: `${DIR}/${date}_${req.body.photoGriffe}`,
+          photo5: `${DIR}/${date}_${req.body.photo5}`,
+          photo6: `${DIR}/${date}_${req.body.photo6}`
+        }]),
+        catalogType: req.body.catalogType,
+        category: req.body.category,
+        kind: req.body.kind,
+        brand: req.body.brand,
+        model: req.body.model,
+        matter: req.body.matter,
+        color: req.body.color,
+        description: req.body.description,
+        dimensions: JSON.stringify([{
+          height: req.body.height,
+          width: req.body.width,
+          depth: req.body.depth,
+        }]),
+        stateOfProduct: req.body.stateChoice,
+        amount: JSON.stringify([{
+          price: req.body.price,
+          amountWin: req.body.amountWin,
+        }]),
+        user: JSON.stringify([{
+          userId: req.body.userId,
+          userImg: req.body.userImg,
+          userName: req.body.userName,
+          userCountry: req.body.userName,
+        }]),
+        status: 'waiting',
+        createdAt: today,
       }
-      console.log('product', product);
-      connection.query('INSERT INTO products SET ?', product, function (error, results, fields) {
+      connection.query('INSERT INTO products SET ?', productToSend, function (error, results, fields) {
         if (error) {
+          console.log('error', error)
           res.status(400).json({
             error: error,
             message: 'There are some error with query'
@@ -80,7 +109,7 @@ router.post('/', (req, res) => {
       error: error,
     });
   }
-})
+});
 
 /**
  * PUT products by id
