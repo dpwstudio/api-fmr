@@ -3,14 +3,27 @@ const router = express.Router();
 const _ = require('lodash');
 const connection = require('../db/db');
 const moment = require('moment');
+const url = require('url');
 
 
 /**
  * GET Products
  */
-router.get('/', function (req, res, next) {
+router.post('/', function (req, res, next) {
+    console.log('xxxx', req.body);
+    const filters = req.body ? {
+      catalogType: req.body.catalogType ? req.body.catalogType : '',
+      category: req.body.category ? req.body.category : '',
+    } : {};
+
   try {
-    connection.query('SELECT * FROM products', function (error, results, fields) {
+    let query = '';
+    if (req.body) {
+      query = `SELECT * FROM products WHERE catalogType="${req.body.catalogType}" AND category="${req.body.category}"`;
+    } else {
+      query = 'SELECT * FROM products';
+    }
+    connection.query(query, function (error, results, fields) {
       if (error) throw error;
       res.status(200).json([...results]);
     });
