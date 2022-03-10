@@ -40,7 +40,7 @@ var upload = multer({
 /**
  * POST Image for upload to server
  */
-router.post('/', upload.array("uploads[]"), (req, res, next) => {
+router.post('/', upload.array("uploads[]", 6), (req, res, next) => {
 	const files = req.files;
 	console.log('files', files);
 	if (!files.length === 0) {

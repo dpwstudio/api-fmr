@@ -52,7 +52,7 @@ router.post('/', (req, res) => {
     if (req) {
       const today = new Date();
       const date = moment().format("YYYYMMDD_HHmm");
-      const DIR = 'http://dpwstudio.local:3000/images/users';
+      const DIR = 'http://dpwstudio.local:3000/images/products';
       const productToSend = {
         img: JSON.stringify([{
           photoFace: `${DIR}/${date}_${req.body.photoFace}`,
@@ -90,6 +90,7 @@ router.post('/', (req, res) => {
         createdAt: today,
       }
       connection.query('INSERT INTO products SET ?', productToSend, function (error, results, fields) {
+        console.log('results', results);
         if (error) {
           console.log('error', error)
           res.status(400).json({
@@ -98,7 +99,8 @@ router.post('/', (req, res) => {
           })
         } else {
           res.status(200).json({
-            message: 'Products created successfully.'
+            message: 'Products created successfully.',
+            idProduct: results.insertId
           })
         }
       });
