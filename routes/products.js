@@ -9,20 +9,25 @@ const url = require('url');
 /**
  * GET Products
  */
-router.post('/', function (req, res, next) {
+router.post('/filters', function (req, res, next) {
     console.log('xxxx', req.body);
-    const filters = req.body ? {
-      catalogType: req.body.catalogType ? req.body.catalogType : '',
-      category: req.body.category ? req.body.category : '',
-    } : {};
+    const filters = {
+      catalogType: req.body.catalogType,
+      category: req.body.category,
+      startDate: req.body.startDate,
+      endDate: req.body.endDate,
+    };
 
   try {
     let query = '';
-    if (req.body) {
-      query = `SELECT * FROM products WHERE catalogType="${req.body.catalogType}" AND category="${req.body.category}"`;
+    if (filters.catalogType && filters.category) {
+      query = `SELECT * FROM products WHERE catalogType="${filters.catalogType}" AND category="${filters.category}"`;
+    } else if (filters.startDate && filters.endDate) {
+      query = `SELECT * FROM products WHERE createdAt BETWEEN "${filters.startDate}" AND "${filters.endDate}"`;
     } else {
       query = 'SELECT * FROM products';
     }
+    console.log('query', query);
     connection.query(query, function (error, results, fields) {
       if (error) throw error;
       res.status(200).json([...results]);
@@ -79,16 +84,24 @@ router.post('/', (req, res) => {
         category: req.body.category,
         kind: req.body.kind,
         brand: req.body.brand,
-        model: req.body.model,
-        matter: req.body.matter,
-        color: req.body.color,
-        description: req.body.description,
+        model: req.body.model.toLowerCase(),
+        matter: req.body.matter.toLowerCase(),
+        color: req.body.color.toLowerCase(),
+        description: req.body.description.toLowerCase(),
         dimensions: JSON.stringify([{
           height: req.body.height,
           width: req.body.width,
-          depth: req.body.depth,
+          length: req.body.length,
+          size: req.body.size,
+          sizeType: req.body.sizeType,
+          diameter: req.body.diameter
         }]),
         stateOfProduct: req.body.stateChoice,
+        authenticity: JSON.stringify([{
+          invoice: req.body.invoice,
+          certificate: req.body.certificate,
+          noProof: req.body.noProof,
+        }]),
         amount: JSON.stringify([{
           price: req.body.price,
           amountWin: req.body.amountWin,
@@ -97,7 +110,7 @@ router.post('/', (req, res) => {
           userId: req.body.userId,
           userImg: req.body.userImg,
           userName: req.body.userName,
-          userCountry: req.body.userName,
+          userCountry: req.body.id,
         }]),
         status: 'waiting',
         createdAt: today,
