@@ -30,7 +30,7 @@ router.post('/', (req, res) => {
       connection.query(query, function (error, results, fields) {
         if (results.length > 0) {
           res.status(409).json({
-            message: 'Product already exists in your love'
+            message: 'Product has already been loved'
           })
         } else {
           connection.query('INSERT INTO loves SET ?', love, function (error, results, fields) {
@@ -41,7 +41,7 @@ router.post('/', (req, res) => {
               })
             } else {
               res.status(200).json({
-                message: 'Product has been successfully added in your Love.'
+                message: 'Product has been successfully loved.'
               })
             }
           });
@@ -58,12 +58,12 @@ router.post('/', (req, res) => {
 
 
 /**
- * GET Love by userId
+ * GET Love by productId
  */
-router.get('/:userId', (req, res) => {
+router.get('/:productId', (req, res) => {
   try {
-    const userId = req.params.userId;
-    const query = `SELECT w.*, p.img, p.catalogType, p.kind, p.brand, p.amount, p.model, p.userId AS productUserId, u.firstname, u.img AS userImg, u.ctryCode FROM loves AS w, products AS p, users AS u WHERE w.productId = p.id AND p.userId = u.id AND w.userId="${userId}"`
+    const productId = req.params.productId;
+    const query = `SELECT * FROM loves WHERE productId="${productId}"`
     connection.query(query, (error, result) => {
       console.log('error', error);
       if (result.length === 0) {
