@@ -7,7 +7,7 @@ const url = require('url');
 
 
 /**
- * GET Products
+ * POST Products (récupère les produits)
  */
 router.post('/filters', function (req, res, next) {
     console.log('xxxx', req.body);
@@ -21,11 +21,11 @@ router.post('/filters', function (req, res, next) {
   try {
     let query = '';
     if (filters.catalogType && filters.category) {
-      query = `SELECT * FROM products WHERE catalogType="${filters.catalogType}" AND category="${filters.category}"`;
+      query = `SELECT DISTINCT p.*, u.firstname, u.ctryCode, u.img AS userImg, u.createdAt AS userDateMember FROM products AS p, users AS u INNER JOIN users WHERE p.userId = u.id AND catalogType="${filters.catalogType}" AND category="${filters.category}"`;
     } else if (filters.startDate && filters.endDate) {
-      query = `SELECT * FROM products WHERE createdAt BETWEEN "${filters.startDate}" AND "${filters.endDate}"`;
+      query = `SELECT DISTINCT p.*, u.firstname, u.ctryCode, u.img AS userImg, u.createdAt AS userDateMember FROM products AS p, users AS u INNER JOIN users WHERE p.userId = u.id AND p.createdAt BETWEEN "${filters.startDate}" AND "${filters.endDate}"`;
     } else {
-      query = 'SELECT * FROM products';
+      query = 'SELECT DISTINCT p.*, u.firstname, u.ctryCode, u.img AS userImg, u.createdAt AS userDateMember FROM products AS p, users AS u INNER JOIN users WHERE p.userId = u.id';
     }
     console.log('query', query);
     connection.query(query, function (error, results, fields) {
@@ -82,6 +82,7 @@ router.post('/', (req, res) => {
         }]),
         catalogType: req.body.catalogType,
         category: req.body.category,
+        subCategory: req.body.subCategory,
         kind: req.body.kind,
         brand: req.body.brand,
         model: req.body.model.toLowerCase(),
@@ -94,6 +95,7 @@ router.post('/', (req, res) => {
           length: req.body.length,
           size: req.body.size,
           sizeType: req.body.sizeType,
+          sizeClothes: req.body.sizeClothes,
           diameter: req.body.diameter
         }]),
         stateOfProduct: req.body.stateChoice,
@@ -106,12 +108,7 @@ router.post('/', (req, res) => {
           price: req.body.price,
           amountWin: req.body.amountWin,
         }]),
-        user: JSON.stringify([{
-          userId: req.body.userId,
-          userImg: req.body.userImg,
-          userName: req.body.userName,
-          userCountry: req.body.id,
-        }]),
+        userId: req.body.userId,
         status: 'waiting',
         createdAt: today,
       }
